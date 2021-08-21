@@ -1,0 +1,372 @@
+library(shiny)
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(#Add elements as arguments to fluidPage
+  
+#########  Create reactive inputs with an *Input() function ######### 
+  # Buttons:
+    # actionButton(inputId, label, icon = NULL, width = NULL, ...)
+    # submitButton(text = "Apply Changes", icon = NULL, width = NULL)
+  
+  # Single Checkbox:
+    # checkboxInput(inputId, label, value = FALSE, width = NULL)
+  
+  # Checkbox group:
+    # checboxGroupInput(
+      # inputId =
+      # label =
+      # choices = NULL,
+      # selected = NULL,
+      # inline = FALSE,
+      # width = NULL,
+      # choiceNames = NULL,
+      # choiceValues = NULL
+    )
+  
+  # Date Input:
+    # dateInput(
+      # inputId =
+      # label =
+      # value = NULL,
+      # min = NULL,
+      # max = NULL,
+      # format = "yyyy-mm-dd",
+      # startview = "month",
+      # weekstart = 0,
+      # language = "en",
+      # width = NULL,
+      # autoclose = TRUE,
+      # datesdisabled = NULL,
+      # daysofweekdisabled = NULL)
+  
+  # Date range:
+    # dateRangeInput(
+      # inputId =
+      # label =
+      # start = NULL,
+      # end = NULL,
+      # min = NULL,
+      # max = NULL,
+      # format = "yyyy-mm-dd",
+      # startview = "month",
+      # weekstart = 0,
+      # language = "en",
+      # separator = " to ",
+      # width = NULL,
+      # autoclose = TRUE)
+  
+  # File input:
+    # fileInput(
+      # inputId =
+      # label =
+      # multiple = FALSE,
+      # accept = NULL,
+      # width = NULL,
+      # buttonLabel = "Browse...",
+      # placeholder = "No file selected")
+  
+  # Numeric input:
+    # numbericInput(
+      # inputId =
+      # label =
+      # value =
+      # min = NA,
+      # max = NA,
+      # step = NA,
+      # width = NULL)
+  
+  # Password input:
+    # passwordInput(
+      # inputId =
+      # label =
+      # value = "",
+      # width = NULL,
+      # placeholder = NULL)
+  
+  # Radio buttons:
+    # radioButtons(inputId,
+      # label =
+      # choices = NULL,
+      # selected = NULL,
+      # inline = FALSE,
+      # width = NULL,
+      # choiceNames = NULL,
+      # choiceValues = NULL)
+  
+  # Select box:
+    # selectInput(
+      # inputId =
+      # label =
+      # choices =
+      # selected = NULL,
+      # multiple = FALSE,
+      # selectize = TRUE,
+      # width = NULL,
+      # size = NULL)
+  
+  # Sliders:
+    # sliderInput(inputID = "num", label = "Choose a number", min, max, value)
+  
+  # Text input:
+    # textInput(
+      # inputId =
+      # label =
+      # value = "",
+      # width = NULL,
+      # placeholder = NULL)
+  
+#########  Display reactive results with an *Output() function ######### 
+
+    # dataTableOutput(outputId) -> an interactive table
+
+    # htmlOutput( -> raw HTML
+        # outputId =,
+        # inline = FALSE,
+        # container = if (inline) span else div,)
+
+    # imageOutput( -> image
+      # outputId =,
+      # width = "100%",
+      # height = "400px",
+      # click = NULL,
+      # dblclick = NULL,
+      # hover = NULL,
+      # brush = NULL,
+      # inline = FALSE
+  
+    # plotOutput( -> plot
+      # outputId =,
+      # width = "100%",
+      # height = "400px",
+      # click = NULL,
+      # dblclick = NULL,
+      # hover = NULL,
+      # brush = NULL,
+      # inline = FALSE
+  
+    # tableOutput(outputId) -> table
+
+    # textOutput( -> text
+      # outputId =,
+      # container = if (inline) span else div,
+      # inline = FALSE
+  
+    # uiOutput( -> a Shiny UI element
+      #outputId =,
+      # inline = FALSE,
+      # container = if (inline) span else div, ...
+  
+    # verbatimTextOutput(outputId, placeholder = FALSE) -> text
+
+
+######### Reactive Values ###########
+
+### Reactive Values MUST work with Reactive Functions ###
+### The job of a reactive value is to notify things downstream that they have changed. ###
+
+# Reactive values work together with reactive functions.
+# You cannot call a reactive value from outside of one.
+
+######### 7 Reactive Functions = "Observer" #########
+
+##### How to customize reactions #####
+
+### A function that takes reactive values, and knows what to do with them ###
+### Its job is to respond to changes in reactive values and update itself ### 
+
+# 1. Render - Displays Output: Builds reactive output to display in UI:
+#     The block of code must begin and end with { will respond each time the reactive value CHANGES }
+#     renderPlot( { hist(rnorm(input$num)) } )
+#     ALWAYS save to output$
+
+# 2. Modularize code with reactive() - an object to use
+#     Builds a reactive object (reactive expression)
+#     reactive makes the code available to use later on:
+#     data <-  reactive( { rnormIinput$num } )
+#     ALWAYS call the reactive expression like a function: data(), with the ()
+#     Reactive expressions know whether they are valid or invalid
+#     Reactive expressions save the value in computer memory
+#     Reactive expressions will also return most recent valid value (or re-runs code and saves the value)
+
+# 3. Prevent reactions with Isolate() - create output that is NOT reactive
+#     Returns the result as a non-reactive value
+#     isolate ( { rnorm(input$num) } )
+#     main = isolate({input$title})
+
+# 4. Trigger code to the run ON THE SERVER SIDE (think in the background) with observeEvent()
+#     observeEvent(input$clicks, { print(input$clicks) } )
+#     Will only respond to changes in reactive values. Period.
+#     Examples: Connect to a database, download data, save data to run files
+#     observeEvent() lets you specify *exactly* which values will invalidate the observer
+# observe() - just a single block of code, will re-run the single block of code. It's an option
+
+# 5. Delay reactions with eventReactive()
+#     data <- eventReactive(input$go, { rnorm(input$num) } )
+#     eventReactive() creates a reactive expression
+#     I can specify precisely which reactive values should invalidate this expression
+#     Usually paired with an action button, but can be paired with any reactive (????)
+
+# 6. Manage state with reactiveValues() - in the SERVER function
+#   I can create my own list of reactive values that I can use programmatically
+#   rv <- reactiveValues(data = rnorm(input$num))
+#   Usually with observeEvent
+
+# Put the bare minimum code in the render function
+
+
+######### HTML Tags INSIDE FLUID PAGE#########
+### Static elements ###
+# tags$
+# tags$a(href = "www.rstudio.com", "RStudio") # makes a named weblink, requires HREF
+# tags$h1, tags$h2, tags$h3, tags$h4, tags$h5, tags$h6 # Headers
+# tags$em("This is a Shiny app"), makes italic text (em = "emphasis")
+# tags$strong("This is a Shiny app"), #makes bold text
+# tags#code("This is a Shiny app.") # makes text that looks like it is code
+# tags$p("This is a, tags$strong("Shiny"), "app.") -> nesting tags together
+# tags$br() inserts a line break
+# tags$hr() inserts a horizontal rule
+# tags$img(height = 100, width = 100, src = "http://www.rstudio.com/images/RStudio.2x.png") # Inserts an image
+# adding images, save file in a subdirectory folder named www
+# HTML("<h1>My Shiny App</h1>") will run within R, as HTML
+
+### Layouts functions ###
+### Layout in a grid, and/or stack them in layers ###
+#fluidRow(#will divide space into horizontal rows)
+#<div class="row"<</div>
+# note width is ALWAYS considered to be *12* units wide
+# The offset argument tells R how many (out of 12) to offset the item from the left
+# The width argument of a column tells R how many of those 12 units the columns is to take up
+#column(width = 2#will divide space into columns) #width argument is mandatory
+#<div class="col-sm-2"></div>
+#fluidRow(
+  #column(3),
+  #column(5),
+#fluidRow(
+  #column(4, offset = 8)
+#)
+
+## Panels - to group multiple elements into a single unit with its own properties ##
+### the 12 functions that make different kind of panels:
+#absolutePanel() <- Panel position set rigidly, absolutely
+#conditionalPanel() <- A JavaScript expression determines whether a panel is visible or not
+#fixedPanel() <- Panel is fixed to browsser window and does not scroll with the page
+#headerPanel() <- Panel for the app's title, used with pageWithSidebar()
+#inputPanel() <- panel with grey background, suitable for grouping inputs
+#mainPanel() <- Panel for displaying output, used with pageWithSidebar()
+#navlistPanel() <- Panel for displaying multiple stacked tabPanels(). Uses sidebar navigation.
+#sidebarPanel() <- Panel for displaying a sidebar of inputs, used with pageWithSidebar()
+#tabPanel() <- Stackable panel. Used with navlistanel() and tabsetPanel()
+  #works with one or more of:
+    #tabsetPanel()
+    #navlistPanel()
+    #navbarPage()
+#tabsetPanel() <- Panel for displaying multiple stacked tabPanels(). Uses tab navigation.
+#titlePanel() <- Panel for the app's title, used with pageWithSidebar()
+#wellPanel() <- Panel with grey background.
+
+### sidebarLayout()
+# Use with sidebarPanel() and mainPanel() to divide app into *two* sections
+# ui <- fluidPage(
+    #sidebarLayout(
+      #sidebarPanel(),
+      #mainPanel()
+    #) 
+  #)
+
+### navbarPage() #replaces fluidPage(), combines tabs into a single page:
+# navbarPage(title = "Title,
+    #tabPanel("tab1", "Contents"),
+    #tabPanel("tab2", "Contents"),
+    #tabPanel("tab3", "Contents")
+  #)
+
+
+
+
+
+# Define server logic
+server <- function(input, output) {
+  
+  # Use the server function to assemble input valuess into outputs. Follow 3 rules:
+  
+  # Rule 1: Save objects to display to output$, for example output$hist <- # R code
+  
+  # Rule 2: Build objects to display with render*()
+    # EXAMPLE: output$hist <- renderPlot({})
+    # The Render function helps assemble them into HTML for final appearance, and keeps track of reactions and reactivity
+    # What I save to output needs to be built with a render function
+  
+      # renderDataTable({}) -> An interactive table
+        # expr,
+        # options = NULL,
+        # searchDelay = 500,
+        # callback = "function(oTable) {}",
+        # escape = TRUE,
+        # env = parent.frame(),
+        # quoted = FALSE,
+        # outputArgs = list())
+  
+      # renderImage({}) -> An image (saved as a link to a source file)
+        # expr,
+        # env = parent.frame(),
+        # quoted = FALSE,
+        # deleteFile,
+        # outputArgs = list()
+  
+      # renderPlot({}) -> A plot
+        # expr,
+        # width = "auto",
+        # height = "auto",
+        # res = 72,
+        # ...,
+        # alt = "Plot object",
+        # env = parent.frame(),
+        # quoted = FALSE,
+        # execOnResize = FALSE,
+        # outputArgs = list()
+  
+      # renderPrint({}) -> A code block of printed output
+        # expr,
+        # env = parent.frame(),
+        # quoted = FALSE,
+        # width = getOption("width"),
+        # outputArgs = list()
+  
+      # renderTable({}) -> A table (from a data frame, matrix, or other table-like structure)
+        # expr,
+        # striped = FALSE,
+        # hover = FALSE,
+        # bordered = FALSE,
+        # spacing = c("s", "xs", "m", "l"),
+        # width = "auto",
+        # align = NULL,
+        # rownames = FALSE,
+        # colnames = TRUE,
+        # digits = NULL,
+        # na = "NA",
+        # ...,
+        # env = parent.frame(),
+        # quoted = FALSE,
+        # outputArgs = list()
+  
+      # renderText({}) -> A character string
+        # expr,
+        # env = parent.frame(),
+        # quoted = FALSE,
+        # outputArgs = list(),
+        # sep = " "
+  
+      # renderUI({}) -> A Shiny UI element
+        # expr
+        # env = parent.frame()
+        # quoted = FALSE
+        # outputArgs = list()
+  
+  # Rule 3. Use input values with input$ IN THE SERVER FUNCTION 
+      # inside the code you sent to render** to make reactive outputs
+      # Example: sliderInput(inputId = "num",...)
+      # input$num -> note these MUST line up in order for this to work!!
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
