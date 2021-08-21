@@ -1,0 +1,40 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+    tags$a(href = "www.rstudio.com", "Click here to go to Rstudio"),
+    sliderInput(inputId = "num",label = "Choose a number", min = 0, max = 10000, value = 1000),
+    sliderInput(inputId = "breaks", label = "choose a number of breaks", min = 1, max = 1000, value = 50),
+    checkboxInput(inputId = "labels",label = "Check if you would like to see the values",value = FALSE),
+    verbatimTextOutput("value"),
+    textInput(inputId = "text",label = "Put some text here",value = "Put some text here"),
+    checkboxGroupInput(inputId = "colors",label = "Select a color", choices = c("red", "green", "blue")),
+    textInput(inputId = "xlab", label = "what should the x-label be?", value = "x-label"),
+        plotOutput("hist"),
+    verbatimTextOutput("stats"),
+    )
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+
+    output$hist <- renderPlot(hist(rnorm(input$num), breaks = input$breaks, main = input$text,
+                                   xlab = input$xlab, col = ({input$colors}),
+                                   labels = input$labels))
+    output$stats <- renderPrint({
+        summary(rnorm(input$num))
+    output$labels <- renderText({input$labels})
+    })
+
+    }
+
+# Run the application 
+shinyApp(ui = ui, server = server)
