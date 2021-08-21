@@ -1,0 +1,32 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+
+# Define UI for application that draws a button that can be clicked
+ui <- fluidPage(
+    actionButton(inputId = "norm",label = "normal"),
+    actionButton(inputId = "unif", label = "Uniform"),
+    plotOutput("hist")
+    )
+
+# Define server logic required to count the number of times the button is clicked
+server <- function(input, output) {
+    rv <- reactiveValues(data = rnorm(100))
+    
+    observeEvent(input$norm, {rv$data <- rnorm(100)})
+    observeEvent(input$unif, {rv$data <- runif(100)})
+    
+    output$hist <- renderPlot({
+        hist(rv$data)
+    })
+    }
+
+# Run the application 
+shinyApp(ui = ui, server = server)
