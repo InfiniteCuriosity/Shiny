@@ -1,0 +1,39 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+    sliderInput(inputId = "num",label = "Choose a number", min = 0, max = 10000, value = 1000),
+    sliderInput(inputId = "breaks", label = "Choose a number of breaks", min = 1,max = 1000, value = 100),
+    
+    textInput(inputId = "title",label = "",value = "Write a title here"),
+    
+    verbatimTextOutput("stats"),
+    
+    
+    plotOutput("hist")
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+    data <- reactive({rnorm(input$num)})
+    output$hist <- renderPlot({
+        hist(data(),breaks = input$breaks,
+             xlab = "Histogram of normal values",
+             main = isolate(input$title))
+    })
+    output$stats <- renderPrint({
+        summary(rnorm(data()))
+    })
+    }
+
+# Run the application 
+shinyApp(ui = ui, server = server)
